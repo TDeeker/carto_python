@@ -60,7 +60,7 @@ def get_map(locations):
     ax = map.show_mpl(figsize=(8,8))
     for location in locations:
         x,y=map.to_pixels(float(location['lat']),float(location['lon']))
-        ax.plot(x, y, 'or', ms=10, mew=2)
+        ax.plot(x, y, 'og', ms=5, mew=2)
         ax.annotate(location['temp'],
                     xy=(x,y),
                     xytext=(3, 3),
