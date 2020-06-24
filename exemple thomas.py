@@ -1,14 +1,14 @@
 import requests
 import config
-import matplotlib.pyplot as plt
 import smopy
+import matplotlib.pyplot as plt
 
 baseurl='http://api.openweathermap.org/data/2.5/weather?appid='+config.apikey + "&units=metric"
 
 def get_locations(filename):
     # Same as 01_carto.py
     geocode=[] # geocode = tableau des listes de coord
-    lonlat=open(filename) # ouverture du fichier
+    lonlat=open(filename, 'r') # ouverture du fichier
     for line in lonlat:
         lon, lat=line.split(',') # on découpe la ligne à la ","
         coord={} # coord est une liste vide
@@ -53,6 +53,20 @@ def get_weather(c):
     c["temp"]=weather['main']['temp']
     return c
 
+def get_map(locations):
+    area=get_area(locations)
+    map = smopy.Map( (area['lat_min'],area['lon_min'],area['lat_max'],area['lon_max']) , z=8)
+    #create figure with the map
+    ax = map.show_mpl(figsize=(8,8))
+    for location in locations:
+        x,y=map.to_pixels(float(location['lat']),float(location['lon']))
+        ax.plot(x, y, 'or', ms=10, mew=2)
+        ax.annotate(location['temp'],
+                    xy=(x,y),
+                    xytext=(3, 3),
+                    textcoords="offset points",)
+    plt.show()
+    return True
 
 def main():
     #1 - get locations from file :
@@ -63,20 +77,20 @@ def main():
     for location in locations :
         location = get_weather(location)
 
-    #3 - get area boundary  :
-    area = get_area(locations)
-    print_dict(area,"AREA")
 
-    #4 - get the map (according to boundaries)
-
-    # NOW, we have all the data we need, no more API Request !
-
-    #4 display locations (print) :
+    #3 display locaQtions (print) :
     nbligne=0
     for location in locations :
         nbligne=nbligne+1
         sep = "LIGNE %d"  % nbligne
         print_dict(location,sep)
+
+
+    #4 - get the map (according to boundaries)
+    map = get_map(locations)
+
+    # NOW, we have all the data we need, no more API Request !
+
 
 
 
