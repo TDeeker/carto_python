@@ -51,6 +51,7 @@ def get_weather(c):
     weather=requests.get(url).json()
     print(weather)
     c["temp"]=weather['main']['temp']
+    c["humidity"]=weather['main']['humidity']
     return c
 
 def get_map(locations):
@@ -60,8 +61,9 @@ def get_map(locations):
     ax = map.show_mpl(figsize=(8,8))
     for location in locations:
         x,y=map.to_pixels(float(location['lat']),float(location['lon']))
-        ax.plot(x, y, 'og', ms=5, mew=2)
-        ax.annotate(location['temp'],
+        ax.plot(x, y, 'or', ms=5, mew=2)
+        ax.annotate(
+        'T=%s \n H=%s' % (location['temp'],location["humidity"]),
                     xy=(x,y),
                     xytext=(3, 3),
                     textcoords="offset points",)
