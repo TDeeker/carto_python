@@ -5,12 +5,13 @@ import config
 
 base_url='http://api.openweathermap.org/data/2.5/weather?q='
 
-city = input("Ville preferé?")
+city = input("ta ville préférée?")
 
 complete_url = base_url + city + "&appid=" + config.apikey +"&units=metric&lang=fr"
 
 weather_data = requests.get(complete_url).json()
 
+print("le meteo pour ta ville préférée:")
 print(weather_data['main']['temp'], "°C")
 print(weather_data['main']['humidity'],"%")
 
