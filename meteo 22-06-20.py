@@ -1,8 +1,7 @@
 import requests
+import config
 
-api='eb11325570e95d8884ab3386f8f0f46c'
-
-base_url="http://api.openweathermap.org/data/2.5/weather?appid="+api+"&units=metric"
+base_url="http://api.openweathermap.org/data/2.5/weather?appid="+config.apikey+"&units=metric"
 
 
 def get_location():
@@ -11,11 +10,33 @@ def get_location():
     for line in lonlat:
         lat,lon=line.split(",")
         coord={'ltt':lat.strip(),
-                'lng':lon.strip(),
-                }
+                'lng':lon.strip(),}
 
         geocode.append(coord)
     return(geocode)
+
+def print_dict(l,titre):
+    print("==== %s ====" % titre)
+    for item in l:
+        print(item, " = ", l[item])
+
+def get_area(locations):
+    lat_min=lat_max=locations[0]['lat']
+    lon_min=lon_max=locations[0]['lon']
+    for location in locations:
+        lat_min=min(lat_min, location['lat'])
+        lat_max=max(lat_max, location['lat'])
+        lon_min=min(lon_min, location['lon'])
+        lon_max=max(lon_max, location['lon'])
+
+    o_lat=((lat_max-lat_min)/100)*10
+    o_lon=((lon_max-lon_max)/100)*10
+    lat_min=lat_min-o_lat
+    lat_max=lat_max+o_lat
+    lon_min=lon_min-o_lon
+    lon_max=lon_max+o_lon
+
+    return{'lat_min':lat_min,'lat_max':lat_max,'lon_min':lon_min,'lon_max':lon_max}
 
 def get_weather(c):
     lat=c['ltt']
@@ -25,6 +46,24 @@ def get_weather(c):
     data=requests.get(url).json()
     print(data)
 
-coords=get_location()
-print(coords[0]);
-get_weather(coords[0])
+def main():
+
+    locations = get_locations('lonlatonly.txt')
+
+
+    for location in locations :
+        location = get_weather(location)
+
+    area = get_area(locations)
+    print_dict(area,"AREA")
+
+    nbligne=0
+    for location in locations :
+        nbligne=nbligne+1
+        sep = "LIGNE %d"  % nbligne
+        print_dict(location,sep)
+
+
+
+if __name__ == "__main__":
+    main()
